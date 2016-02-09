@@ -1,0 +1,5 @@
+BEGIN {$DB::deep = 500}
+use DB::Pluggable;
+DB::Pluggable->run_with_config(\<<EOINI)
+[DataPrinter]
+EOINI

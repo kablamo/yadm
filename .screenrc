@@ -1,0 +1,50 @@
+startup_message   off
+term              screen-256color
+setenv            LC_CTYPE en_GB.UTF-8
+defutf8           on
+defscrollback     10000
+nonblock          on
+nethack           on
+vbell             off
+maptimeout        900
+shell             bash
+escape            ``
+
+bindkey ì next
+bindkey è prev
+
+bindkey `git   screen -t git     0
+bindkey `.     screen -t .       1
+bindkey `repl  screen -t repl    5
+bindkey `t     screen -t t       6
+bindkey `db    screen -t db      7
+bindkey `model screen -t model   8
+bindkey `ctlr  screen -t ctlr    9
+bindkey `tt    screen -t tt     10
+bindkey `css   screen -t css    11
+bindkey `js    screen -t js     12
+bindkey `log   screen -t log    13
+bindkey `srvr  screen -t srvr   14
+
+caption splitonly
+hardstatus on
+hardstatus alwayslastline
+#hardstatus string "%w"
+#hardstatus string "%{.kW}%-w%{.W}%n %t%{-}%{=b kw}%?%+w%? %=%c %d/%m/%Y" #B&W & date&time
+#hardstatus string "%{.kW}%-w%{.W}%n %t%{-}%{=b kw}%?%+w%? %=%c %d/%m/%Y" #B&W & date&time
+#hardstatus string "%{.kW}%-w%{.W}%n %t%{-}%+w %=%C %a "
+#hardstatus string "%{=b kw} %?%-w%?%{=br kw}%n %t%{=b kw}%?%+w%? %="    #B&W
+hardstatus string "%{= kw} %?%-w%?%{=u kw}%n %t%{= kw}%?%+w%? %="    #B&W
+sorendition kw
+
+screen -t git 0
+scrollback        10000
+screen -t . 1
+scrollback        10000
+screen -t . 2
+scrollback        10000
+screen -t . 3
+scrollback        10000
+screen -t srvr 14
+scrollback        10000
+
