@@ -1,0 +1,3 @@
+# this only runs the first time i login after yadm is setup. it reloads the
+# shell with the latest stuff pulled down via yadm
+[ ! -f ~/.vim/bundle/vim-fugitive/.git ] && . ~/.bash/work.sh
