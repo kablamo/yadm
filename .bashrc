@@ -10,6 +10,7 @@ HISTFILESIZE=2000                  # see HISTFILESIZE in bash(1)
 shopt -s checkwinsize
 shopt -s histappend                # append to the history file, don't overwrite
 
+source ~/.bash/work.sh
 source ~/.bash/path.sh
 source ~/.bash/env.sh
 source ~/.bash/aliases.sh
