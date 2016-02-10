@@ -8,9 +8,6 @@ export LESS="-MSiRXF"
 # TODO: delete this
 export PAGER="/usr/bin/less"
 
-# https://github.com/rupa/z
-. ~/bin/z.sh
-
 # https://github.com/ap/perldoc-complete
 complete -C ./perldoc-complete/perldoc-complete -o nospace -o default perldoc
 

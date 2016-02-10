@@ -57,7 +57,7 @@ cpanm-metacpan-favorites() {
     metacpan-favorites | cpanm -nv
 }
 
-vman() {
+man() {
     vim -c "SuperMan $*"
 
     if [ "$?" != "0" ]; then
@@ -78,8 +78,6 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias -- -='cd -'
-alias cdd='cd ~/.dotfiles'
-alias cdp='cd ~/.puppet'
 alias cp='/bin/cp -v' 
 alias mv='/bin/mv -v' 
 alias rm='/bin/rm -v' 
@@ -124,12 +122,6 @@ alias reload="exec bash -l"
 
 alias tree="tree -I local"
 alias env="env | sort"
-
-
-# TODO remove this
-# local aliases
-[ -f $HOME/.aliases ] &&
-   . $HOME/.aliases
 
 # local bashrc
 [ -f $HOME/.bashrc.local ] &&
