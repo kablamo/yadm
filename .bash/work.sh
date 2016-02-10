@@ -3,9 +3,9 @@
 [ -f ~/.rex-environment ] && . ~/.rex-environment
 
 if [ -d ~/.yadm ]; then
+    cd
     yadm pull > /dev/null 2>&1 
     if [ ! -f ~/.vim/bundle/vim-fugitive/.git ]; then
-        cd
         yadm submodule init
         yadm submodule update
         exec bash -l
