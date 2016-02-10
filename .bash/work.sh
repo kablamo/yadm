@@ -2,7 +2,10 @@
 [ -f ~/.bash_functions  ] && . ~/.bash_functions
 [ -f ~/.rex-environment ] && . ~/.rex-environment
 
-if [ ! -f ~/.vim/bundle/vim-fugitive/.git ]; then
-    yadm submodule init
-    yadm submodule update
+if [ -d ~/.yadm ]; then
+    yadm pull
+    if [ ! -f ~/.vim/bundle/vim-fugitive/.git ]; then
+        yadm submodule init
+        yadm submodule update
+    fi
 fi
