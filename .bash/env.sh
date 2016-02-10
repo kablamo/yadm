@@ -12,7 +12,7 @@ export PAGER="/usr/bin/less"
 . ~/bin/z.sh
 
 # https://github.com/ap/perldoc-complete
-complete -C perldoc-complete -o nospace -o default perldoc
+complete -C ./perldoc-complete/perldoc-complete -o nospace -o default perldoc
 
 # all my envs! plenv, rbenv, pyenv, ndenv, etc
 [ -x $HOME/.anyenv ] && eval "$(anyenv init -)"

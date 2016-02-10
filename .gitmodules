@@ -55,3 +55,6 @@
 [submodule ".vim/bundle/fzf.vim"]
 	path = .vim/bundle/fzf.vim
 	url = git@github.com:junegunn/fzf.vim.git
+[submodule ".perldoc-complete"]
+	path = .perldoc-complete
+	url = git@github.com:ap/perldoc-complete.git
