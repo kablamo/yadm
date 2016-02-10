@@ -7,5 +7,6 @@ if [ -d ~/.yadm ]; then
     if [ ! -f ~/.vim/bundle/vim-fugitive/.git ]; then
         yadm submodule init
         yadm submodule update
+        reload
     fi
 fi
