@@ -2,15 +2,11 @@
 [ -f ~/.bash_functions  ] && . ~/.bash_functions
 [ -f ~/.rex-environment ] && . ~/.rex-environment
 
-if [ -d ~/.yadm ]; then
-    if [ ! -f ~/.vim/bundle/vim-fugitive/.git ]; then
-        cd
-        yadm reset --hard origin/master
-        yadm submodule init
-        yadm submodule update
-        exec bash -l
-    else
-        cd
-        yadm pull
-    fi
+if [ ! -f ~/.yadm/first-time ]; then
+    cd
+    yadm reset --hard origin/master
+    yadm submodule init
+    yadm submodule update
+    touch ~/.yaadm/first-time
+    exec bash -l
 fi
