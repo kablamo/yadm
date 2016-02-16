@@ -7,6 +7,6 @@ if [ ! -f ~/.yadm/first-time ]; then
     yadm reset --hard origin/master
     yadm submodule init
     yadm submodule update
-    touch ~/.yaadm/first-time
+    touch ~/.yadm/first-time
     exec bash -l
 fi
