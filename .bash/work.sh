@@ -8,5 +8,6 @@ if [ ! -f ~/.yadm/first-time ]; then
     yadm submodule init
     yadm submodule update
     touch ~/.yadm/first-time
+    cd -
     exec bash -l
 fi
