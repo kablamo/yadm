@@ -9,6 +9,9 @@ HISTFILESIZE=2000                  # see HISTFILESIZE in bash(1)
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 shopt -s histappend                # append to the history file, don't overwrite
+shopt -s nocaseglob
+shopt -s direxpand
+shopt -s dirspell
 
 source ~/.bash/work.sh
 source ~/.bash/path.sh

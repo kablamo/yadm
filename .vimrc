@@ -12,6 +12,7 @@ set cursorline " highlight current line
 if version >= 703
     set cryptmethod=blowfish
 endif
+set diffopt=filler,vertical
 set encoding=utf-8
 set exrc " for vroom
 set foldenable
@@ -85,13 +86,13 @@ vnoremap <tab> %
 map <space> :e#<cr>
 
 " edit dotfiles
-map <leader>ea :e ~/.dotfiles/links/.bash/aliases.sh<cr>
-map <leader>ee :e ~/.dotfiles/links/.bash/env.sh<cr>
-map <leader>ec :e ~/.dotfiles/links/.vim/colors/iijo.vim<cr>
-map <leader>eg :e ~/.dotfiles/links/.gitconfig<cr>
-map <leader>ev :e ~/.dotfiles/links/.vimrc<cr>
+map <leader>ea :e ~/.bash/aliases.sh<cr>
+map <leader>ee :e ~/.bash/env.sh<cr>
+map <leader>ec :e ~/.vim/colors/iijo.vim<cr>
+map <leader>eg :e ~/.gitconfig<cr>
+map <leader>ev :e ~/.vimrc<cr>
 map <leader>et :e ~/Dropbox/.todo/todo.txt<cr>
-map <leader>em :e ~/.dotfiles/links/.tmux.conf<cr>
+map <leader>em :e ~/.tmux.conf<cr>
 
 " edit local dotfiles
 map <leader>ela :e $HOME/.aliases<cr>
@@ -256,7 +257,6 @@ map Q :qall<cr>
 nmap <leader>gv :Gitv --all<cr>
 nmap <leader>gV :Gitv! --all<cr>
 vmap <leader>gV :Gitv! --all<cr>
-cabbrev git Git
 
 " rm whitespace at the end of lines
 function! TrimWhiteSpace()
