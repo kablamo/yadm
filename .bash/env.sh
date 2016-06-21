@@ -9,7 +9,8 @@ export LESS="-MSiRXF"
 export PAGER="/usr/bin/less"
 
 # https://github.com/ap/perldoc-complete
-complete -C ./perldoc-complete/perldoc-complete -o nospace -o default perldoc
+[ -x $HOME/.perldoc-complete/perldoc-complete ] && 
+    complete -C $HOME/.perldoc-complete/perldoc-complete -o nospace -o default perldoc
 
 # all my envs! plenv, rbenv, pyenv, ndenv, etc
 [ -x $HOME/.anyenv ] && eval "$(anyenv init -)"
