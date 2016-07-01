@@ -96,6 +96,7 @@ func TestIrrelevantNth(t *testing.T) {
 		opts := defaultOptions()
 		words := []string{"--nth", "..", "-x"}
 		parseOptions(opts, words)
+		postProcessOptions(opts)
 		if len(opts.Nth) != 0 {
 			t.Errorf("nth should be empty: %s", opts.Nth)
 		}
@@ -104,6 +105,7 @@ func TestIrrelevantNth(t *testing.T) {
 		{
 			opts := defaultOptions()
 			parseOptions(opts, words)
+			postProcessOptions(opts)
 			if len(opts.Nth) != 0 {
 				t.Errorf("nth should be empty: %s", opts.Nth)
 			}
@@ -112,6 +114,7 @@ func TestIrrelevantNth(t *testing.T) {
 			opts := defaultOptions()
 			words = append(words, "-x")
 			parseOptions(opts, words)
+			postProcessOptions(opts)
 			if len(opts.Nth) != 2 {
 				t.Errorf("nth should not be empty: %s", opts.Nth)
 			}
@@ -120,14 +123,14 @@ func TestIrrelevantNth(t *testing.T) {
 }
 
 func TestParseKeys(t *testing.T) {
-	pairs := parseKeyChords("ctrl-z,alt-z,f2,@,Alt-a,!,ctrl-G,J,g", "")
+	pairs := parseKeyChords("ctrl-z,alt-z,f2,@,Alt-a,!,ctrl-G,J,g,ALT-enter,alt-SPACE", "")
 	check := func(i int, s string) {
 		if pairs[i] != s {
 			t.Errorf("%s != %s", pairs[i], s)
 		}
 	}
-	if len(pairs) != 9 {
-		t.Error(9)
+	if len(pairs) != 11 {
+		t.Error(11)
 	}
 	check(curses.CtrlZ, "ctrl-z")
 	check(curses.AltZ, "alt-z")
@@ -138,6 +141,8 @@ func TestParseKeys(t *testing.T) {
 	check(curses.CtrlA+'g'-'a', "ctrl-G")
 	check(curses.AltZ+'J', "J")
 	check(curses.AltZ+'g', "g")
+	check(curses.AltEnter, "ALT-enter")
+	check(curses.AltSpace, "alt-SPACE")
 
 	// Synonyms
 	pairs = parseKeyChords("enter,Return,space,tab,btab,esc,up,down,left,right", "")
@@ -231,15 +236,11 @@ func TestBind(t *testing.T) {
 	keymap := defaultKeymap()
 	execmap := make(map[int]string)
 	check(actBeginningOfLine, keymap[curses.CtrlA])
-	keymap, execmap, toggleSort :=
-		parseKeymap(keymap, execmap, false,
-			"ctrl-a:kill-line,ctrl-b:toggle-sort,c:page-up,alt-z:page-down,"+
-				"f1:execute(ls {}),f2:execute/echo {}, {}, {}/,f3:execute[echo '({})'],f4:execute;less {};,"+
-				"alt-a:execute@echo (,),[,],/,:,;,%,{}@,alt-b:execute;echo (,),[,],/,:,@,%,{};"+
-				",,:abort,::accept,X:execute:\nfoobar,Y:execute(baz)")
-	if !toggleSort {
-		t.Errorf("toggleSort not set")
-	}
+	parseKeymap(keymap, execmap,
+		"ctrl-a:kill-line,ctrl-b:toggle-sort,c:page-up,alt-z:page-down,"+
+			"f1:execute(ls {}),f2:execute/echo {}, {}, {}/,f3:execute[echo '({})'],f4:execute;less {};,"+
+			"alt-a:execute@echo (,),[,],/,:,;,%,{}@,alt-b:execute;echo (,),[,],/,:,@,%,{};"+
+			",,:abort,::accept,X:execute:\nfoobar,Y:execute(baz)")
 	check(actKillLine, keymap[curses.CtrlA])
 	check(actToggleSort, keymap[curses.CtrlB])
 	check(actPageUp, keymap[curses.AltZ+'c'])
@@ -259,15 +260,11 @@ func TestBind(t *testing.T) {
 	checkString("\nfoobar,Y:execute(baz)", execmap[curses.AltZ+'X'])
 
 	for idx, char := range []rune{'~', '!', '@', '#', '$', '%', '^', '&', '*', '|', ';', '/'} {
-		keymap, execmap, toggleSort =
-			parseKeymap(keymap, execmap, false, fmt.Sprintf("%d:execute%cfoobar%c", idx%10, char, char))
+		parseKeymap(keymap, execmap, fmt.Sprintf("%d:execute%cfoobar%c", idx%10, char, char))
 		checkString("foobar", execmap[curses.AltZ+int([]rune(fmt.Sprintf("%d", idx%10))[0])])
 	}
 
-	keymap, execmap, toggleSort = parseKeymap(keymap, execmap, false, "f1:abort")
-	if toggleSort {
-		t.Errorf("toggleSort set")
-	}
+	parseKeymap(keymap, execmap, "f1:abort")
 	check(actAbort, keymap[curses.F1])
 }
 
@@ -326,5 +323,55 @@ func TestParseNilTheme(t *testing.T) {
 	newTheme = parseTheme(theme, "prompt:12,dark,prompt:13")
 	if newTheme.Prompt != 13 {
 		t.Errorf("color should now be enabled and customized")
+	}
+}
+
+func TestDefaultCtrlNP(t *testing.T) {
+	check := func(words []string, key int, expected actionType) {
+		opts := defaultOptions()
+		parseOptions(opts, words)
+		postProcessOptions(opts)
+		if opts.Keymap[key] != expected {
+			t.Error()
+		}
+	}
+	check([]string{}, curses.CtrlN, actDown)
+	check([]string{}, curses.CtrlP, actUp)
+
+	check([]string{"--bind=ctrl-n:accept"}, curses.CtrlN, actAccept)
+	check([]string{"--bind=ctrl-p:accept"}, curses.CtrlP, actAccept)
+
+	hist := "--history=/tmp/foo"
+	check([]string{hist}, curses.CtrlN, actNextHistory)
+	check([]string{hist}, curses.CtrlP, actPreviousHistory)
+
+	check([]string{hist, "--bind=ctrl-n:accept"}, curses.CtrlN, actAccept)
+	check([]string{hist, "--bind=ctrl-n:accept"}, curses.CtrlP, actPreviousHistory)
+
+	check([]string{hist, "--bind=ctrl-p:accept"}, curses.CtrlN, actNextHistory)
+	check([]string{hist, "--bind=ctrl-p:accept"}, curses.CtrlP, actAccept)
+}
+
+func TestToggle(t *testing.T) {
+	optsFor := func(words ...string) *Options {
+		opts := defaultOptions()
+		parseOptions(opts, words)
+		postProcessOptions(opts)
+		return opts
+	}
+
+	opts := optsFor()
+	if opts.ToggleSort {
+		t.Error()
+	}
+
+	opts = optsFor("--bind=a:toggle-sort")
+	if !opts.ToggleSort {
+		t.Error()
+	}
+
+	opts = optsFor("--bind=a:toggle-sort", "--bind=a:up")
+	if opts.ToggleSort {
+		t.Error()
 	}
 }

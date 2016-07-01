@@ -1,6 +1,66 @@
 CHANGELOG
 =========
 
+0.13.2
+------
+- Fixed race condition where preview window is not properly cleared
+
+0.13.1
+------
+- Fixed UI issue with large `--preview` output with many ANSI codes
+
+0.13.0
+------
+- Added preview feature
+    - `--preview CMD`
+    - `--preview-window POS[:SIZE][:hidden]`
+- `{}` in execute action is now replaced to the single-quoted (instead of
+  double-quoted) string of the current line
+- Fixed to ignore control characters for bracketed paste mode
+
+0.12.2
+------
+
+- 256-color capability detection does not require `256` in `$TERM`
+- Added `print-query` action
+- More named keys for binding; <kbd>F1</kbd> ~ <kbd>F10</kbd>,
+  <kbd>ALT-/</kbd>, <kbd>ALT-space</kbd>, and <kbd>ALT-enter</kbd>
+- Added `jump` and `jump-accept` actions that implement [EasyMotion][em]-like
+  movement
+  ![][jump]
+
+[em]: https://github.com/easymotion/vim-easymotion
+[jump]: https://cloud.githubusercontent.com/assets/700826/15367574/b3999dc4-1d64-11e6-85da-28ceeb1a9bc2.png
+
+0.12.1
+------
+
+- Ranking algorithm introduced in 0.12.0 is now universally applied
+- Fixed invalid cache reference in exact mode
+- Fixes and improvements in Vim plugin and shell extensions
+
+0.12.0
+------
+
+- Enhanced ranking algorithm
+- Minor bug fixes
+
+0.11.4
+------
+
+- Added `--hscroll-off=COL` option (default: 10) (#513)
+- Some fixes in Vim plugin and shell extensions
+
+0.11.3
+------
+
+- Graceful exit on SIGTERM (#482)
+- `$SHELL` instead of `sh` for `execute` action and `$FZF_DEFAULT_COMMAND` (#481)
+- Changes in fuzzy completion API
+    - [`_fzf_compgen_{path,dir}`](https://github.com/junegunn/fzf/commit/9617647)
+    - [`_fzf_complete_COMMAND_post`](https://github.com/junegunn/fzf/commit/8206746)
+      for post-processing
+
 0.11.2
 ------
 

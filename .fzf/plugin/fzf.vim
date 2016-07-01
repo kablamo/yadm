@@ -49,7 +49,7 @@ function! s:fzf_exec()
       throw 'fzf executable not found'
     endif
   endif
-  return s:exec
+  return s:shellesc(s:exec)
 endfunction
 
 function! s:tmux_enabled()
@@ -74,7 +74,7 @@ function! s:shellesc(arg)
 endfunction
 
 function! s:escape(path)
-  return escape(a:path, ' %#''"\')
+  return escape(a:path, ' $%#''"\')
 endfunction
 
 " Upgrade legacy options
@@ -121,6 +121,10 @@ try
     throw v:exception
   endtry
 
+  if !has_key(dict, 'source') && !empty($FZF_DEFAULT_COMMAND)
+    let dict.source = $FZF_DEFAULT_COMMAND
+  endif
+
   if has_key(dict, 'source')
     let source = dict.source
     let type = type(source)
@@ -136,10 +140,10 @@ try
   else
     let prefix = ''
   endif
-  let tmux = !has('nvim') && s:tmux_enabled() && s:splittable(dict)
+  let tmux = (!has('nvim') || get(g:, 'fzf_prefer_tmux', 0)) && s:tmux_enabled() && s:splittable(dict)
   let command = prefix.(tmux ? s:fzf_tmux(dict) : fzf_exec).' '.optstr.' > '.temps.result
 
-  if has('nvim')
+  if has('nvim') && !tmux
     return s:execute_term(dict, command, temps)
   endif
 
@@ -175,7 +179,7 @@ function! s:fzf_tmux(dict)
     endif
   endfor
   return printf('LINES=%d COLUMNS=%d %s %s %s --',
-    \ &lines, &columns, s:fzf_tmux, size, (has_key(a:dict, 'source') ? '' : '-'))
+    \ &lines, &columns, s:shellesc(s:fzf_tmux), size, (has_key(a:dict, 'source') ? '' : '-'))
 endfunction
 
 function! s:splittable(dict)
@@ -189,7 +193,7 @@ function! s:pushd(dict)
       return 1
     endif
     let a:dict.prev_dir = cwd
-    execute 'chdir' s:escape(a:dict.dir)
+    execute 'lcd' s:escape(a:dict.dir)
     let a:dict.dir = getcwd()
     return 1
   endif
@@ -210,7 +214,7 @@ function! s:popd(dict, lines)
   "   directory is not expected and should be undone.
   if has_key(a:dict, 'prev_dir') &&
         \ (!&autochdir || (empty(a:lines) || len(a:lines) == 1 && empty(a:lines[0])))
-    execute 'chdir' s:escape(remove(a:dict, 'prev_dir'))
+    execute 'lcd' s:escape(remove(a:dict, 'prev_dir'))
   endif
 endfunction
 
@@ -239,7 +243,7 @@ function! s:exit_handler(code, command, ...)
   return 1
 endfunction
 
-function! s:execute(dict, command, temps)
+function! s:execute(dict, command, temps) abort
   call s:pushd(a:dict)
   silent! !clear 2> /dev/null
   let escaped = escape(substitute(a:command, '\n', '\\n', 'g'), '%#')
@@ -255,7 +259,7 @@ function! s:execute(dict, command, temps)
   return s:exit_handler(v:shell_error, command) ? s:callback(a:dict, a:temps) : []
 endfunction
 
-function! s:execute_tmux(dict, command, temps)
+function! s:execute_tmux(dict, command, temps) abort
   let command = a:command
   if s:pushd(a:dict)
     " -c '#{pane_current_path}' is only available on tmux 1.9 or above
@@ -285,7 +289,7 @@ function! s:calc_size(max, val, dict)
 endfunction
 
 function! s:getpos()
-  return {'tab': tabpagenr(), 'win': winnr(), 'cnt': winnr('$')}
+  return {'tab': tabpagenr(), 'win': winnr(), 'cnt': winnr('$'), 'tcnt': tabpagenr('$')}
 endfunction
 
 function! s:split(dict)
@@ -294,7 +298,7 @@ function! s:split(dict)
   \ 'down':  ['botright', 'resize', &lines],
   \ 'left':  ['vertical topleft', 'vertical resize', &columns],
   \ 'right': ['vertical botright', 'vertical resize', &columns] }
-  let s:ppos = s:getpos()
+  let ppos = s:getpos()
   try
     for [dir, triple] in items(directions)
       let val = get(a:dict, dir, '')
@@ -307,53 +311,60 @@ function! s:split(dict)
         endif
         execute cmd sz.'new'
         execute resz sz
-        return
+        return [ppos, {}]
       endif
     endfor
     if s:present(a:dict, 'window')
       execute a:dict.window
     else
-      tabnew
+      execute (tabpagenr()-1).'tabnew'
     endif
+    return [ppos, { '&l:wfw': &l:wfw, '&l:wfh': &l:wfh }]
   finally
-    setlocal winfixwidth winfixheight buftype=nofile bufhidden=wipe nobuflisted
+    setlocal winfixwidth winfixheight
   endtry
 endfunction
 
-function! s:execute_term(dict, command, temps)
-  call s:split(a:dict)
-
-  let fzf = { 'buf': bufnr('%'), 'dict': a:dict, 'temps': a:temps, 'name': 'FZF' }
-  let s:command = a:command
+function! s:execute_term(dict, command, temps) abort
+  let [ppos, winopts] = s:split(a:dict)
+  let fzf = { 'buf': bufnr('%'), 'ppos': ppos, 'dict': a:dict, 'temps': a:temps,
+            \ 'name': 'FZF', 'winopts': winopts, 'command': a:command }
+  function! fzf.switch_back(inplace)
+    if a:inplace && bufnr('') == self.buf
+      " FIXME: Can't re-enter normal mode from terminal mode
+      " execute "normal! \<c-^>"
+      b #
+      " No other listed buffer
+      if bufnr('') == self.buf
+        enew
+      endif
+    endif
+  endfunction
   function! fzf.on_exit(id, code)
-    let pos = s:getpos()
-    let inplace = pos == s:ppos " {'window': 'enew'}
-    if !inplace
+    if s:getpos() == self.ppos " {'window': 'enew'}
+      for [opt, val] in items(self.winopts)
+        execute 'let' opt '=' val
+      endfor
+      call self.switch_back(1)
+    else
       if bufnr('') == self.buf
         " We use close instead of bd! since Vim does not close the split when
         " there's no other listed buffer (nvim +'set nobuflisted')
         close
       endif
-      if pos.tab == s:ppos.tab
-        wincmd p
-      endif
+      execute 'tabnext' self.ppos.tab
+      execute self.ppos.win.'wincmd w'
     endif
 
-    if !s:exit_handler(a:code, s:command, 1)
+    if !s:exit_handler(a:code, self.command, 1)
       return
     endif
 
     call s:pushd(self.dict)
+    let ret = []
     try
       let ret = s:callback(self.dict, self.temps)
-
-      if inplace && bufnr('') == self.buf
-        execute "normal! \<c-^>"
-        " No other listed buffer
-        if bufnr('') == self.buf
-          bd!
-        endif
-      endif
+      call self.switch_back(s:getpos() == self.ppos)
     finally
       call s:popd(self.dict, ret)
     endtry
@@ -362,17 +373,16 @@ function! s:execute_term(dict, command, temps)
   call s:pushd(a:dict)
   call termopen(a:command, fzf)
   call s:popd(a:dict, [])
-  setlocal nospell
+  setlocal nospell bufhidden=wipe nobuflisted
   setf fzf
   startinsert
   return []
 endfunction
 
-function! s:callback(dict, temps)
+function! s:callback(dict, temps) abort
+let lines = []
 try
-  if !filereadable(a:temps.result)
-    let lines = []
-  else
+  if filereadable(a:temps.result)
     let lines = readfile(a:temps.result)
     if has_key(a:dict, 'sink')
       for line in lines
@@ -391,12 +401,12 @@ try
   for tf in values(a:temps)
     silent! call delete(tf)
   endfor
-
-  return lines
 catch
   if stridx(v:exception, ':E325:') < 0
     echoerr v:exception
   endif
+finally
+  return lines
 endtry
 endfunction
 
