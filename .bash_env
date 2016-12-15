@@ -1,0 +1,7 @@
+unset GEM_PATH
+export PATH=$PATH:/usr/lib/node_modules/casperjs/node_modules/phantomjs/lib/phantom/bin
+export FZF_DEFAULT_OPTS="--color=bw --history-size=10000"
+export NO_METADATA_DOWNLOAD=0
+source /etc/bash_completion
+alias rechef='sudo /usr/bin/chef-client -L /tmp/chef.log'
+alias chef-zero="sudo chef-client -L /tmp/chef.log -z -N ${USER} -j nodes/${USER}.json -o "

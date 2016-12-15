@@ -322,12 +322,12 @@ map <leader>aa :Tabularize
 map <leader>a :Tabularize<cr>
 
 " fzf
-" Mapping selecting mappings
+set rtp+=~/.fzf
+map <leader>f :Files<cr>
+map <leader>a :Ag 
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
-
-" Insert mode completion
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
