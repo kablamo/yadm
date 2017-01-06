@@ -61,3 +61,6 @@
 [submodule ".vim/bundle/vim-eunuch"]
 	path = .vim/bundle/vim-eunuch
 	url = git@github.com:tpope/vim-eunuch.git
+[submodule ".vim/bundle/file-line"]
+	path = .vim/bundle/file-line
+	url = git@github.com:bogado/file-line.git
