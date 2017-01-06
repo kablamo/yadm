@@ -9,9 +9,9 @@ if [ $? != 0 ]
     tmux send-keys htop C-m
     tmux split-window "watch -n 5 iwconfig wlan0"
     tmux split-window "watch -n 30 'sensors | tail -n 4'"
-    tmux split-window "bmon -p lo,wlan0 -o curses:bgchar=' '"
+#   tmux split-window "bmon -p lo,wlan0 -o curses:bgchar=' '"
     tmux send-keys down
-    tmux resize-pane -t 1 -y 8
+#   tmux resize-pane -t 1 -y 8
     tmux resize-pane -t 4 -y 24
     tmux resize-pane -t 2 -y 16
     tmux resize-pane -t 3 -y 5
