@@ -11,4 +11,6 @@ if [ ! -f ~/.yadm/first-time ]; then
     touch ~/.yadm/first-time
     cd -
     exec bash -l
+else
+    yadm submodule update
 fi
