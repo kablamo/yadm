@@ -61,3 +61,6 @@
 [submodule ".vim/bundle/file-line"]
 	path = .vim/bundle/file-line
 	url = git@github.com:bogado/file-line.git
+[submodule ".perldoc-complete"]
+	path = .perldoc-complete
+	url = git@github.com:ap/perldoc-complete.git
