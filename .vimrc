@@ -144,18 +144,18 @@ map <leader>i :insert<cr>
 " nnoremap <Space> za
 " vnoremap <Space> za
 
-" foldtext
-function! PerlFoldText()
-  let text  = getline(v:foldstart)
-  let sub   = ' ' . substitute(text, '\(sub \w\+\).*', '\1', 'g')
-  let lines = v:foldend - v:foldstart
-  let lines = ' (' . lines . ' lines) '
-  return  sub . lines
-endfunction
-
-augroup perl_files
-   set foldtext=PerlFoldText()
-augroup end
+"" foldtext
+"function! PerlFoldText()
+"  let text  = getline(v:foldstart)
+"  let sub   = ' ' . substitute(text, '\(sub \w\+\).*', '\1', 'g')
+"  let lines = v:foldend - v:foldstart
+"  let lines = ' (' . lines . ' lines) '
+"  return  sub . lines
+"endfunction
+"
+"augroup perl_files
+"   set foldtext=PerlFoldText()
+"augroup end
 
 " NERD Commenter
 let NERDSpaceDelims=2
@@ -330,6 +330,12 @@ imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" vim easy align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 try
     source $HOME/.vimrc.local
