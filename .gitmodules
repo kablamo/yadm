@@ -64,9 +64,6 @@
 [submodule ".perldoc-complete"]
 	path = .perldoc-complete
 	url = git@github.com:ap/perldoc-complete.git
-[submodule ".vim/bundle/indentLine"]
-	path = .vim/bundle/indentLine
-	url = git@github.com:Yggdroot/indentLine.git
 [submodule ".vim/bundle/vim-easy-align"]
 	path = .vim/bundle/vim-easy-align
 	url = https://github.com/junegunn/vim-easy-align
