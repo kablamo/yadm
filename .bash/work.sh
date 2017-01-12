@@ -15,3 +15,5 @@ else
     yadm submodule init
     yadm submodule update
 fi
+
+[ -r $HOME/.dataprinter ] && chmod g-w $HOME/.dataprinter

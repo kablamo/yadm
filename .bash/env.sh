@@ -30,3 +30,4 @@ fi
 source "$HOME/.fzf/shell/key-bindings.bash"
 export FZF_DEFAULT_OPTS="--color=dark --history-size=10000"
 
+[ -r $HOME/.dataprinter ] && chmod g-w $HOME/.dataprinter
