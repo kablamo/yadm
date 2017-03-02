@@ -332,10 +332,10 @@ imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
 " vim easy align
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+" to use EasyAlign: ea in visual mode
+" to use LiveEasyAlign: ea C-P in visual mode
+xmap ea <Plug>(EasyAlign)
+nmap ea <Plug>(EasyAlign)
 
 try
     source $HOME/.vimrc.local
