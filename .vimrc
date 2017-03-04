@@ -315,10 +315,6 @@ hi GitGutterChange       cterm=none ctermfg=165 ctermbg=233
 hi GitGutterDelete       cterm=bold ctermfg=162 ctermbg=233
 hi GitGutterChangeDelete cterm=none ctermfg=160 ctermbg=233
 
-" Tabular
-map <leader>aa :Tabularize
-map <leader>a :Tabularize<cr>
-
 " fzf
 set rtp+=~/.fzf
 map <leader>f :Files<cr>
@@ -334,8 +330,8 @@ imap <c-x><c-l> <plug>(fzf-complete-line)
 " vim easy align
 " to use EasyAlign: ea in visual mode
 " to use LiveEasyAlign: ea C-P in visual mode
-xmap ea <Plug>(EasyAlign)
-nmap ea <Plug>(EasyAlign)
+xmap aa <Plug>(EasyAlign)
+nmap aa <Plug>(EasyAlign)
 
 try
     source $HOME/.vimrc.local
