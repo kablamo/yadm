@@ -68,7 +68,7 @@ let vimsyn_folding='af'
 let xml_syntax_folding=1
 
 " colors
-syntax on  " sometimes this is not on by default
+syntax off " sometimes this is not on by default
 colorscheme iijo
 au BufNewFile,BufRead *.tt setf tt2html
 au BufNewFile,BufRead *.md setf mkd
@@ -230,18 +230,6 @@ vmap K y:Man <c-r>"<cr>
 vmap * y/<c-r>"<cr>
 vmap # y?<c-r>"<cr>
 
-" ctrlp
-let g:ctrlp_max_files = 30000
-let g:ctrlp_max_depth = 50
-let g:ctrlp_by_filename = 1
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_open_multiple_files = '1jr'
-let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
-let g:ctrlp_extensions = [
-  \ 'tag', 'buffertag', 'quickfix', 'dir', 'rtscript',
-  \ 'undo', 'line', 'changes', 'mixed', 'bookmarkdir']
-map <leader>t :CtrlPTag<cr>
-
 " gundo
 map <leader>u :GundoToggle<cr>
 
@@ -315,9 +303,9 @@ hi GitGutterChange       cterm=none ctermfg=165 ctermbg=233
 hi GitGutterDelete       cterm=bold ctermfg=162 ctermbg=233
 hi GitGutterChangeDelete cterm=none ctermfg=160 ctermbg=233
 
-" Tabular
-map <leader>aa :Tabularize
-map <leader>a :Tabularize<cr>
+"" Tabular
+"map <leader>aa :Tabularize
+"map <leader>a :Tabularize<cr>
 
 " fzf
 set rtp+=~/.fzf
@@ -334,8 +322,8 @@ imap <c-x><c-l> <plug>(fzf-complete-line)
 " vim easy align
 " to use EasyAlign: ea in visual mode
 " to use LiveEasyAlign: ea C-P in visual mode
-xmap ea <Plug>(EasyAlign)
-nmap ea <Plug>(EasyAlign)
+xmap <leader>a <Plug>(EasyAlign)
+nmap <leader>a <Plug>(EasyAlign)
 
 try
     source $HOME/.vimrc.local

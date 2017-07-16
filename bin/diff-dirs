@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use Getopt::Long::Descriptive;
+use Path::Class qw/file dir/;
+use List::Util qw/first/;
+
+# Copied from ExtUtils::MakeMaker (by many authors)
+sub prompt {
+    my ( $mess, $def ) = @_;
+    Carp::croak("prompt function called without an argument")
+      unless defined $mess;
+ 
+    my $dispdef = defined $def ? "[$def] " : " ";
+    $def = defined $def ? $def : "";
+ 
+    local $| = 1;
+    local $\;
+    print "$mess $dispdef";
+ 
+    my $ans;
+    if ( $ENV{PERL_MM_USE_DEFAULT} || !_is_interactive() ) {
+        print "$def\n";
+    }
+    else {
+        $ans = <STDIN>;
+        if ( defined $ans ) {
+            chomp $ans;
+        }
+        else { # user hit ctrl-D
+            print "\n";
+        }
+    }
+ 
+    return ( !defined $ans || $ans eq '' ) ? $def : $ans;
+}
+ 
+# Copied (without comments) from IO::Interactive::Tiny by Daniel Muey,
+# based on IO::Interactive by Damian Conway and brian d foy
+sub _is_interactive {
+    my ($out_handle) = ( @_, select );
+    return 0 if not -t $out_handle;
+    if ( tied(*ARGV) or defined( fileno(ARGV) ) ) {
+        return -t *STDIN if defined $ARGV && $ARGV eq '-';
+        return @ARGV > 0 && $ARGV[0] eq '-' && -t *STDIN if eof *ARGV;
+        return -t *ARGV;
+    }
+    else {
+        return -t *STDIN;
+    }
+}
+
+sub find_files {
+    my ($dir) = @_;
+    my @files = `find $dir -print`;
+    my @f = strip_dir($dir, @files);
+    return @f;
+}
+
+sub strip_dir {
+    my ($dir, @old_files) = @_;
+    my @new_files;
+    for my $old_file (@old_files) {
+        chomp $old_file;
+        $old_file =~ s/^$dir//;
+        push @new_files, $old_file;
+    }
+    return @new_files;
+}
+
+sub main {
+    my ($opt, $usage) = describe_options(
+        'diff-dirs %o DIR_A DIR_B',
+        ['files|f'   => 'Filenames only. Don\'t diff the file contents.'],
+        ['diff|d'    => 'Use normal boring "diff" instead of fancy "vimdiff"'],
+        ['recurse|r' => 'Diff all the subdirectories too'],
+        ['help|h'    => 'Print this message'],
+    );
+
+    die $usage if $opt->help;
+    die $usage unless scalar(@ARGV) == 2;
+
+    my $a_dir   = $ARGV[0];
+    my $b_dir   = $ARGV[1];
+
+    my @a_files = find_files($a_dir);
+    my @b_files = find_files($b_dir);
+
+    my %a_files = map { $_ => 1 } @a_files;
+    my %b_files = map { $_ => 1 } @b_files;
+
+    foreach my $file (@a_files) {
+
+        my $a = "$a_dir/$file";
+        my $b = "$b_dir/$file";
+        $a =~ s|//|/|g;
+        $b =~ s|//|/|g;
+
+        next if -d $a;
+
+        `diff '$a' '$b' 2>&1 > /dev/null`;
+        my $return_code = $? >> 8;
+        next if $return_code == 0;
+
+        if ($opt->{files}) {
+            print "'$a' '$b'\n";
+            next;
+        }
+
+        my $diff = $opt->diff ? 'diff' : 'vimdiff';
+        my $cmd = $diff . " \"$a\" \"$b\"";
+        my $answer = prompt("$file -- view diff? (y/n)", "y");
+        next if $answer eq 'n';
+
+        my $pid = fork();
+        if (!$pid) { # child
+            exec($cmd);
+        }
+        waitpid $pid, 0;
+    }
+}
+
+main();

@@ -103,6 +103,11 @@ alias distupgrade='sudo apt-get dist-upgrade'
 alias search="apt-cache search"
 alias show="apt-cache show"
 
+alias sstart='sudo systemctl start '
+alias sstop='sudo systemctl stop '
+alias sstatus='sudo systemctl status '
+alias srestart='sudo systemctl restart '
+
 alias minicpanm='cpanm --mirror ~/minicpan --mirror-only'
 alias darkpan='cpanm --mirror http://mycompany.co.uk/DPAN --mirror-only'
 alias pod='perlfind'
