@@ -94,6 +94,7 @@ alias p="watch -n 1 'ps awwwuxf | grep eric | grep -v awwwuxf'"
 alias pw='genpass --minlength 15 --maxlength 15'
 alias free='free -m'
 alias findly='find . -name '
+alias gdrive='grive'
 
 alias install='sudo apt-get install'
 alias remove='sudo apt-get remove'
