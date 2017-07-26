@@ -8,7 +8,8 @@ call pathogen#helptags()
 
 " set things
 set copyindent
-set cursorline " highlight current line
+set nocursorline   " highlighting current line is slow
+set nocursorcolumn " highlighting current column is slow
 set cryptmethod=blowfish2
 set diffopt=filler,vertical
 set encoding=utf-8
