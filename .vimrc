@@ -15,7 +15,7 @@ set encoding=utf-8
 set exrc " for vroom
 set foldenable
 set foldlevelstart=9
-set foldmethod=syntax
+set foldmethod=manual
 set fillchars=fold:\ ,vert:\ ,stl:\ ,stlnc:\
 set guioptions=m
 set helpheight=200
@@ -48,32 +48,19 @@ set winminheight=0
 set wildignore=tags
 set wildmode=longest,list,full
 
-" filetype (required for perl omni completion and vundle)
-filetype on
-filetype plugin on
-filetype indent on
-
 " command line editing
 cnoremap <C-A> <Home>
 
 " mapleader
 let mapleader=";"
 
-" enable syntaxfolding
-let javaScript_fold=1
-let perl_fold=1
-let ruby_fold=1
-let sh_fold_enabled=1
-let vimsyn_folding='af'
-let xml_syntax_folding=1
-
 " colors
-syntax off " sometimes this is not on by default
+syntax on " sometimes this is not on by default
 colorscheme iijo
 au BufNewFile,BufRead *.tt setf tt2html
 au BufNewFile,BufRead *.md setf mkd
 if has("gui_running")
-    colorscheme zmrok
+    colorscheme zmrock
 end
 
 " use tab to find matching parens
