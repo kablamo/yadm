@@ -40,7 +40,7 @@ set shortmess=aoOtI " short messages so vi doesn't ask me to hit enter all the t
 set showcmd
 set smartcase
 set smarttab
-set softtabstop=4
+set softtabstop=0
 set tags=$HOME/perl5/tags
 set tabstop=4
 set textwidth=0
@@ -83,6 +83,9 @@ map <leader>em :e ~/.tmux.conf<cr>
 " edit local dotfiles
 map <leader>ela :e $HOME/.aliases<cr>
 map <leader>elv :e $HOME/.vimrc.local<cr>
+
+" open a file using selected text
+map <leader>ef y:e <c-r>0<cr>
 
 " easier to escape
 inoremap jj <ESC>
@@ -171,15 +174,19 @@ let g:tagbar_autoclose = 0
 let g:tagbar_indent = 1
 
 " perltidy
-autocmd BufRead,BufNewFile *.t,*.pl,*.plx,*.pm command! -range=% -nargs=* Tidy <line1>,<line2>!perltidy -q
-autocmd BufRead,BufNewFile *.sql,*.t,*.pl,*.plx,*.pm noremap <leader>pt :Tidy<CR>
+" define a :Tidy command to run perltidy on visual selection || entire buffer"
+command -range=% -nargs=* Tidy <line1>,<line2>!perltidy -q
+
+" run :Tidy on entire buffer and return cursor to (approximate) original position"
 fun DoTidy()
     let l:winview = winsaveview()
     :Tidy
     call winrestview(l:winview)
 endfun
-" autocmd BufWrite *.t,*.pl,*.plx,*.pm call DoTidy()
-noremap <leader>pt :Tidy<CR>
+
+" call :DoTidy every time you save a (perl) file
+"autocmd BufWrite *.t,*.pl,*.plx,*.pm call DoTidy()
+noremap <C-F6> :Tidy<CR>
 
 " xml tidy
 " autocmd BufRead,BufNewFile *.xml command! -range=% -nargs=* Tidy <line1>,<line2>!xmllint --pretty 1 %
@@ -281,7 +288,7 @@ let g:gitgutter_signs           = 1
 let g:gitgutter_highlight_lines = 0
 let g:gitgutter_realtime        = 0
 let g:gitgutter_eager           = 0
-let g:gitgutter_diff_args       = '-w'
+"let g:gitgutter_diff_args       = '-w'
 let g:gitgutter_sign_added            = '+'
 let g:gitgutter_sign_modified         = '~'
 let g:gitgutter_sign_removed          = '_'
@@ -308,10 +315,13 @@ imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
 " vim easy align
-" to use EasyAlign: ea in visual mode
-" to use LiveEasyAlign: ea C-P in visual mode
+" to use     EasyAlign: <leader>a     in visual mode
+" to use LiveEasyAlign: <leader>a C-P in visual mode
 xmap <leader>a <Plug>(EasyAlign)
 nmap <leader>a <Plug>(EasyAlign)
+
+" EditorConfig
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 
 try
     source $HOME/.vimrc.local
