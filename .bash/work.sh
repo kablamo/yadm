@@ -11,6 +11,4 @@ if [ ! -f ~/.yadm/first-time ]; then
     exec bash -l
 fi
 
-yadm pull
-
 [ -r $HOME/.dataprinter ] && chmod g-w $HOME/.dataprinter
