@@ -3,7 +3,7 @@ Package fzf implements fzf, a command-line fuzzy finder.
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Junegunn Choi
+Copyright (c) 2017 Junegunn Choi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +28,10 @@ package fzf
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/junegunn/fzf/src/util"
 )
-
-func initProcs() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
 
 /*
 Reader   -> EvtReadFin
@@ -48,14 +43,16 @@ Matcher  -> EvtHeader         -> Terminal (update header)
 */
 
 // Run starts fzf
-func Run(opts *Options) {
-	initProcs()
-
+func Run(opts *Options, revision string) {
 	sort := opts.Sort > 0
 	sortCriteria = opts.Criteria
 
 	if opts.Version {
-		fmt.Println(version)
+		if len(revision) > 0 {
+			fmt.Printf("%s (%s)\n", version, revision)
+		} else {
+			fmt.Println(version)
+		}
 		os.Exit(exitOk)
 	}
 
@@ -63,78 +60,67 @@ func Run(opts *Options) {
 	eventBox := util.NewEventBox()
 
 	// ANSI code processor
-	ansiProcessor := func(data []byte) ([]rune, []ansiOffset) {
-		return util.BytesToRunes(data), nil
-	}
-	ansiProcessorRunes := func(data []rune) ([]rune, []ansiOffset) {
-		return data, nil
+	ansiProcessor := func(data []byte) (util.Chars, *[]ansiOffset) {
+		return util.ToChars(data), nil
 	}
 	if opts.Ansi {
 		if opts.Theme != nil {
 			var state *ansiState
-			ansiProcessor = func(data []byte) ([]rune, []ansiOffset) {
+			ansiProcessor = func(data []byte) (util.Chars, *[]ansiOffset) {
 				trimmed, offsets, newState := extractColor(string(data), state, nil)
 				state = newState
-				return []rune(trimmed), offsets
+				return util.ToChars([]byte(trimmed)), offsets
 			}
 		} else {
 			// When color is disabled but ansi option is given,
 			// we simply strip out ANSI codes from the input
-			ansiProcessor = func(data []byte) ([]rune, []ansiOffset) {
+			ansiProcessor = func(data []byte) (util.Chars, *[]ansiOffset) {
 				trimmed, _, _ := extractColor(string(data), nil, nil)
-				return []rune(trimmed), nil
+				return util.ToChars([]byte(trimmed)), nil
 			}
-		}
-		ansiProcessorRunes = func(data []rune) ([]rune, []ansiOffset) {
-			return ansiProcessor([]byte(string(data)))
 		}
 	}
 
 	// Chunk list
 	var chunkList *ChunkList
+	var itemIndex int32
 	header := make([]string, 0, opts.HeaderLines)
 	if len(opts.WithNth) == 0 {
-		chunkList = NewChunkList(func(data []byte, index int) *Item {
+		chunkList = NewChunkList(func(item *Item, data []byte) bool {
 			if len(header) < opts.HeaderLines {
 				header = append(header, string(data))
 				eventBox.Set(EvtHeader, header)
-				return nil
+				return false
 			}
-			runes, colors := ansiProcessor(data)
-			return &Item{
-				text:   runes,
-				colors: colors,
-				rank:   buildEmptyRank(int32(index))}
+			item.text, item.colors = ansiProcessor(data)
+			item.text.Index = itemIndex
+			itemIndex++
+			return true
 		})
 	} else {
-		chunkList = NewChunkList(func(data []byte, index int) *Item {
-			runes := util.BytesToRunes(data)
-			tokens := Tokenize(runes, opts.Delimiter)
+		chunkList = NewChunkList(func(item *Item, data []byte) bool {
+			tokens := Tokenize(string(data), opts.Delimiter)
 			trans := Transform(tokens, opts.WithNth)
+			transformed := joinTokens(trans)
 			if len(header) < opts.HeaderLines {
-				header = append(header, string(joinTokens(trans)))
+				header = append(header, transformed)
 				eventBox.Set(EvtHeader, header)
-				return nil
+				return false
 			}
-			item := Item{
-				text:     joinTokens(trans),
-				origText: &runes,
-				colors:   nil,
-				rank:     buildEmptyRank(int32(index))}
-
-			trimmed, colors := ansiProcessorRunes(item.text)
-			item.text = trimmed
-			item.colors = colors
-			return &item
+			item.text, item.colors = ansiProcessor([]byte(transformed))
+			item.text.Index = itemIndex
+			item.origText = &data
+			itemIndex++
+			return true
 		})
 	}
 
 	// Reader
 	streamingFilter := opts.Filter != nil && !sort && !opts.Tac && !opts.Sync
 	if !streamingFilter {
-		reader := Reader{func(data []byte) bool {
+		reader := NewReader(func(data []byte) bool {
 			return chunkList.Push(data)
-		}, eventBox, opts.ReadZero}
+		}, eventBox, opts.ReadZero)
 		go reader.ReadSource()
 	}
 
@@ -151,30 +137,33 @@ func Run(opts *Options) {
 	}
 	patternBuilder := func(runes []rune) *Pattern {
 		return BuildPattern(
-			opts.Fuzzy, opts.Extended, opts.Case, forward,
-			opts.Nth, opts.Delimiter, runes)
+			opts.Fuzzy, opts.FuzzyAlgo, opts.Extended, opts.Case, opts.Normalize, forward,
+			opts.Filter == nil, opts.Nth, opts.Delimiter, runes)
 	}
 	matcher := NewMatcher(patternBuilder, sort, opts.Tac, eventBox)
 
 	// Filtering mode
 	if opts.Filter != nil {
 		if opts.PrintQuery {
-			fmt.Println(*opts.Filter)
+			opts.Printer(*opts.Filter)
 		}
 
 		pattern := patternBuilder([]rune(*opts.Filter))
 
 		found := false
 		if streamingFilter {
-			reader := Reader{
+			slab := util.MakeSlab(slab16Size, slab32Size)
+			reader := NewReader(
 				func(runes []byte) bool {
-					item := chunkList.trans(runes, 0)
-					if item != nil && pattern.MatchItem(item) {
-						fmt.Println(string(item.text))
-						found = true
+					item := Item{}
+					if chunkList.trans(&item, runes) {
+						if result, _, _ := pattern.MatchItem(&item, false, slab); result != nil {
+							opts.Printer(item.text.ToString())
+							found = true
+						}
 					}
 					return false
-				}, eventBox, opts.ReadZero}
+				}, eventBox, opts.ReadZero)
 			reader.ReadSource()
 		} else {
 			eventBox.Unwatch(EvtReadNew)
@@ -185,7 +174,7 @@ func Run(opts *Options) {
 				chunks:  snapshot,
 				pattern: pattern})
 			for i := 0; i < merger.Length(); i++ {
-				fmt.Println(merger.Get(i).AsString(opts.Ansi))
+				opts.Printer(merger.Get(i).item.AsString(opts.Ansi))
 				found = true
 			}
 		}
@@ -220,14 +209,19 @@ func Run(opts *Options) {
 		delay := true
 		ticks++
 		eventBox.Wait(func(events *util.Events) {
-			defer events.Clear()
+			if _, fin := (*events)[EvtReadFin]; fin {
+				delete(*events, EvtReadNew)
+			}
 			for evt, value := range *events {
 				switch evt {
 
 				case EvtReadNew, EvtReadFin:
 					reading = reading && evt == EvtReadNew
 					snapshot, count := chunkList.Snapshot()
-					terminal.UpdateCount(count, !reading)
+					terminal.UpdateCount(count, !reading, value.(bool))
+					if opts.Sync {
+						terminal.UpdateList(PassMerger(&snapshot, opts.Tac))
+					}
 					matcher.Reset(snapshot, terminal.Input(), false, !reading, sort)
 
 				case EvtSearchNew:
@@ -259,13 +253,13 @@ func Run(opts *Options) {
 							} else if val.final {
 								if opts.Exit0 && count == 0 || opts.Select1 && count == 1 {
 									if opts.PrintQuery {
-										fmt.Println(opts.Query)
+										opts.Printer(opts.Query)
 									}
 									if len(opts.Expect) > 0 {
-										fmt.Println()
+										opts.Printer("")
 									}
 									for i := 0; i < count; i++ {
-										fmt.Println(val.Get(i).AsString(opts.Ansi))
+										opts.Printer(val.Get(i).item.AsString(opts.Ansi))
 									}
 									if count > 0 {
 										os.Exit(exitOk)
@@ -280,6 +274,7 @@ func Run(opts *Options) {
 					}
 				}
 			}
+			events.Clear()
 		})
 		if delay && reading {
 			dur := util.DurWithin(

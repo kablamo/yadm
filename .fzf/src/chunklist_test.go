@@ -3,14 +3,17 @@ package fzf
 import (
 	"fmt"
 	"testing"
+
+	"github.com/junegunn/fzf/src/util"
 )
 
 func TestChunkList(t *testing.T) {
 	// FIXME global
-	sortCriteria = []criterion{byMatchLen, byLength}
+	sortCriteria = []criterion{byScore, byLength}
 
-	cl := NewChunkList(func(s []byte, i int) *Item {
-		return &Item{text: []rune(string(s)), rank: buildEmptyRank(int32(i * 2))}
+	cl := NewChunkList(func(item *Item, s []byte) bool {
+		item.text = util.ToChars(s)
+		return true
 	})
 
 	// Snapshot
@@ -36,14 +39,11 @@ func TestChunkList(t *testing.T) {
 
 	// Check the content of the ChunkList
 	chunk1 := snapshot[0]
-	if len(*chunk1) != 2 {
+	if chunk1.count != 2 {
 		t.Error("Snapshot should contain only two items")
 	}
-	last := func(arr [5]int32) int32 {
-		return arr[len(arr)-1]
-	}
-	if string((*chunk1)[0].text) != "hello" || last((*chunk1)[0].rank) != 0 ||
-		string((*chunk1)[1].text) != "world" || last((*chunk1)[1].rank) != 2 {
+	if chunk1.items[0].text.ToString() != "hello" ||
+		chunk1.items[1].text.ToString() != "world" {
 		t.Error("Invalid data")
 	}
 	if chunk1.IsFull() {
@@ -66,14 +66,14 @@ func TestChunkList(t *testing.T) {
 		!snapshot[1].IsFull() || snapshot[2].IsFull() || count != chunkSize*2+2 {
 		t.Error("Expected two full chunks and one more chunk")
 	}
-	if len(*snapshot[2]) != 2 {
+	if snapshot[2].count != 2 {
 		t.Error("Unexpected number of items")
 	}
 
 	cl.Push([]byte("hello"))
 	cl.Push([]byte("world"))
 
-	lastChunkCount := len(*snapshot[len(snapshot)-1])
+	lastChunkCount := snapshot[len(snapshot)-1].count
 	if lastChunkCount != 2 {
 		t.Error("Unexpected number of items:", lastChunkCount)
 	}

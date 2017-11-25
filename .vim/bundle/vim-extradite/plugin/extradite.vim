@@ -41,7 +41,7 @@ function! s:Extradite(bang) abort
   let path = fugitive#buffer().path()
   try
     let git_dir = fugitive#buffer().repo().dir()
-    let template_cmd = ['--no-pager', 'log', '-n100', '--follow']
+    let template_cmd = ['--no-pager', 'log', '-n1000', '--follow']
     let bufnr = bufnr('')
     let base_file_name = tempname()
     call s:ExtraditeLoadCommitData(a:bang, base_file_name, template_cmd, path)

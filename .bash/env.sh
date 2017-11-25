@@ -29,5 +29,7 @@ fi
 [[ $- == *i* ]] && source "$HOME/.fzf/shell/completion.bash" 2> /dev/null
 source "$HOME/.fzf/shell/key-bindings.bash"
 export FZF_DEFAULT_OPTS="--color=dark --history-size=10000"
+export FZF_TMUX=1
+export FZF_TMUX_HEIGHT=50%
 
 [ -r $HOME/.dataprinter ] && chmod g-w $HOME/.dataprinter

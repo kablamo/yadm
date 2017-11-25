@@ -82,7 +82,7 @@ function! s:startup()
 		silent call s:handle_arg()
 		exec (argidx+1).'argument'
 		" Manually call Syntax autocommands, ignored by `:argdo`.
-		doautocmd Syntax
+		"doautocmd Syntax
 		doautocmd FileType
 	endif
 endfunction
