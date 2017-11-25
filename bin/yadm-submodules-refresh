@@ -10,6 +10,8 @@ my $config = Config::Tiny->read($ENV{HOME} . "/.gitmodules.yadm.ini");
 for my $section (keys %$config) {
     my $path = $config->{$section}->{path};
     my $url  = $config->{$section}->{url};
+
+    next if -e "$path/yadm.skip";
     `rm -rf $path`;
     `git clone $url $path`;
     `rm -rf $path/.git`;
