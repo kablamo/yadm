@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Config::Tiny;
+
+my $config = Config::Tiny->read($ENV{HOME} . "/.yadm/gitmodules.ini");
+
+for my $section (keys %$config) {
+    my $path = $config->{$section}->{path};
+    my $url  = $config->{$section}->{url};
+    `rm -rf $path`;
+    `git clone $url $path`;
+    `rm -rf $path/.git`;
+}

@@ -1,0 +1,3 @@
+rm -rf /home/eric/.gitconfig
+rm -rf /home/eric/.vim/bundle/*
+yadm pull
