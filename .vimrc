@@ -263,6 +263,14 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+command! -bang -nargs=* Files
+  \ call fzf#run({
+  \   'source': 'rg --files --hidden --no-heading --sort-files --color=always -g "!.git" -g "!.local" -g "!repo.git" -g "!.chef" -g "!.debug"',
+  \   'options': '--reverse --color=dark --multi --bind "alt-a:toggle-all"',
+  \   'down': '50%',
+  \   'sink': 'e',
+  \ })
+map <leader>gf :GFiles<cr>
 map <leader>f :Files<cr>
 nmap <leader>* yw:Rg <c-r>"
 vmap <leader>* y:Rg <c-r>"
