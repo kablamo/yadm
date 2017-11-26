@@ -278,9 +278,11 @@ nmap <leader>/ :Rg
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-l> <plug>(fzf-complete-line)
+imap <expr> <c-x><c-f> fzf#complete({
+  \   'source': 'rg --files --hidden --no-heading --sort-files --color=always -g "!.git" -g "!.local" -g "!repo.git" -g "!.chef" -g "!.debug"',
+  \   'options': '--reverse --color=dark --multi --bind "alt-a:toggle-all"',
+  \   'right': '50%',
+  \ })
 
 " EasyAlign
 " to use     EasyAlign: <leader>a     in visual mode
