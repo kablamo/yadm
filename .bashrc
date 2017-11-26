@@ -11,10 +11,10 @@ shopt -s nocaseglob                # case insensitive globbing
 shopt -s direxpand                 # required for dirspell to work
 shopt -s dirspell                  # autocorrect tab complete
 
-source ~/.bash/work.sh
-source ~/.bash/path.sh
-source ~/.bash/env.sh
+source ~/.bash/work.bash
+source ~/.bash/path.bash
+source ~/.bash/env.bash
 source ~/.bash/functions.bash
-source ~/.bash/aliases.sh
+source ~/.bash/aliases.bash
 source ~/.bash/bindings.bash
-source ~/.bash/prompt.sh
+source ~/.bash/prompt.bash
