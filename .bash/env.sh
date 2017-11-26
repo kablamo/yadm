@@ -28,7 +28,9 @@ if [[ ! "$MANPATH" == *$HOME/.fzf/man* && -d "$HOME/.fzf/man" ]]; then
 fi
 [[ $- == *i* ]] && source "$HOME/.fzf/shell/completion.bash" 2> /dev/null
 source "$HOME/.fzf/shell/key-bindings.bash"
-export FZF_DEFAULT_OPTS="--color=dark --history-size=10000"
+export FZF_DEFAULT_OPTS="--color=dark --history-size=10000 --multi --height 50% --bind 'alt-a:toggle-all,ctrl-space:execute(vim {})' --reverse"
+export FZF_DEFAULT_COMMAND="rg --files --sort-files --hidden -g '!.git' -g '!.local' -g '!repo.git' -g '!.chef' -g '!.debug'"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_TMUX=1
 export FZF_TMUX_HEIGHT=50%
 

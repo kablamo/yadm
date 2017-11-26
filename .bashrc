@@ -14,5 +14,7 @@ shopt -s dirspell                  # autocorrect tab complete
 source ~/.bash/work.sh
 source ~/.bash/path.sh
 source ~/.bash/env.sh
+source ~/.bash/functions.bash
 source ~/.bash/aliases.sh
+source ~/.bash/bindings.bash
 source ~/.bash/prompt.sh

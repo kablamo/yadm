@@ -41,7 +41,7 @@ set showcmd
 set smartcase
 set smarttab
 set softtabstop=0
-set tags=$HOME/perl5/tags
+set tags=/usr/local/ddg/tags
 set tabstop=4
 set textwidth=0
 set undolevels=1000
@@ -93,7 +93,7 @@ inoremap jj <ESC>
 " Avoid accidental hits of <F1> while aiming for <Esc>
 map! <F1> <Esc>
 
-" window and buffers
+" Window and buffers
 map <leader>d :bd<cr>
 map <leader>n :bn<cr>
 map <leader>p :bp<cr>
@@ -108,10 +108,7 @@ map <leader>= :winc =<cr>
 nmap <leader>Y "*y
 nmap <leader>P "*p
 
-" commandline awesum sauce
-map <leader>x :Sscratch<cr>:0r !
-
-" fugitive keybindings
+" Fugitive keybindings
 map <leader>gco :Git! checkout <c-r><c-g><cr><cr><cr>l
 map <leader>gc. :Gwrite<cr>:Gcommit <c-r><c-g><cr>
 map <leader>gcc :Gcommit<cr>
@@ -131,26 +128,6 @@ imap <C-o> <C-x><C-o>
 " insert quickly
 map <leader>i :insert<cr>
 
-" folding
-" nnoremap <Space> za
-" vnoremap <Space> za
-
-"" foldtext
-"function! PerlFoldText()
-"  let text  = getline(v:foldstart)
-"  let sub   = ' ' . substitute(text, '\(sub \w\+\).*', '\1', 'g')
-"  let lines = v:foldend - v:foldstart
-"  let lines = ' (' . lines . ' lines) '
-"  return  sub . lines
-"endfunction
-"
-"augroup perl_files
-"   set foldtext=PerlFoldText()
-"augroup end
-
-" NERD Commenter
-let NERDSpaceDelims=2
-
 " NERD Tree
 map <leader>ls :NERDTreeToggle<cr>
 map <leader>ls. :NERDTreeFind<cr>
@@ -160,7 +137,7 @@ let NERDTreeStatusline=-1
 let NERDTreeQuitOnOpen=1
 let NERDTreeWinSize=60
 
-" buffergator
+" Buffergator
 let g:buffergator_split_size=10
 let g:buffergator_viewport_split_policy='B'
 let g:buffergator_suppress_keymaps=1
@@ -196,7 +173,7 @@ noremap <C-F6> :Tidy<CR>
 " au BufRead,BufNewFile *.t set filetype=perl | compiler perlprove
 
 " Perldoc
-map <leader>pd :Perldoc <c-r><c-w><cr>
+map <leader>pd :PerlHelp <c-r><c-w><cr>
 
 " Turn off warnings for perl compiler (see ':h :comp')
 let g:perl_compiler_force_warnings = 0
@@ -204,9 +181,9 @@ let g:perl_compiler_force_warnings = 0
 " refactor perl subs
 map <leader>rf <esc>:'<,'>!extract_perl_sub<cr>
 
-" ack
-nmap <leader>* :Ack <cword> %<cr>
-vmap <leader>* y:Ack <c-r>" %<cr>
+" Ack
+nmap <leader>* :Ack <cword><cr>
+vmap <leader>* y:Ack <c-r>"<cr>
 nmap <leader>/ :Ack
 vmap <leader>/ y:Ack <c-r>"
 
@@ -233,20 +210,6 @@ map <leader>vv yy:<c-r>"<bs><cr>
 
 " faster exit
 map Q :qall<cr>
-
-" gitk
-nmap <leader>gv :Gitv --all<cr>
-nmap <leader>gV :Gitv! --all<cr>
-vmap <leader>gV :Gitv! --all<cr>
-
-" rm whitespace at the end of lines
-function! TrimWhiteSpace()
-    let l:winview = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:winview)
-endfunction
-nnoremap <silent> <Leader>d$ :call TrimWhiteSpace()<CR>
-autocmd FileType perl,ruby autocmd BufRead, BufNewFile * :call TrimWhiteSpace()
 
 " airline
 if !exists('g:airline_symbols')
@@ -298,14 +261,10 @@ hi GitGutterChange       cterm=none ctermfg=165 ctermbg=233
 hi GitGutterDelete       cterm=bold ctermfg=162 ctermbg=233
 hi GitGutterChangeDelete cterm=none ctermfg=160 ctermbg=233
 
-"" Tabular
-"map <leader>aa :Tabularize
-"map <leader>a :Tabularize<cr>
-
 " fzf
 set rtp+=~/.fzf
 map <leader>f :Files<cr>
-map <leader>a :Ag 
+map <leader>s :Ag 
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
@@ -314,7 +273,7 @@ imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
-" vim easy align
+" EasyAlign
 " to use     EasyAlign: <leader>a     in visual mode
 " to use LiveEasyAlign: <leader>a C-P in visual mode
 xmap <leader>a <Plug>(EasyAlign)
