@@ -1,6 +1,6 @@
 alias hg='history | grep --color=auto'
 alias grep='grep --color=auto'
-alias rg='rg --line-number --column --no-heading --colors path:none --colors line:none --colors match:style:bold --colors match:fg:yellow'
+alias rg='rg --line-number --column --no-heading --colors path:none --colors line:none --colors match:style:bold --colors match:fg:green'
 alias gf='git df | fzf --border'
 alias ll='ls -alFh'
 alias la='ls -A'

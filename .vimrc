@@ -181,12 +181,6 @@ let g:perl_compiler_force_warnings = 0
 " refactor perl subs
 map <leader>rf <esc>:'<,'>!extract_perl_sub<cr>
 
-" Ack
-nmap <leader>* :Ack <cword><cr>
-vmap <leader>* y:Ack <c-r>"<cr>
-nmap <leader>/ :Ack
-vmap <leader>/ y:Ack <c-r>"
-
 " quickfix
 map fn :cn<cr>
 map fp :cp<cr>
@@ -263,8 +257,16 @@ hi GitGutterChangeDelete cterm=none ctermfg=160 ctermbg=233
 
 " fzf
 set rtp+=~/.fzf
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --hidden --column --line-number --no-heading --color=always --colors path:none --colors line:none --colors match:style:bold --colors match:fg:green '.<q-args>, 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
 map <leader>f :Files<cr>
-map <leader>s :Ag 
+nmap <leader>* yw:Rg <c-r>"
+vmap <leader>* y:Rg <c-r>"
+nmap <leader>/ :Rg
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
