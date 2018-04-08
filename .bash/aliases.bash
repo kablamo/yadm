@@ -63,6 +63,8 @@ alias reload="exec bash -l"
 alias tree="tree -I local"
 alias env="env | sort"
 
+alias scrot="gnome-screenshot"
+
 # local bashrc
 [ -f $HOME/.bashrc.local ] &&
    . $HOME/.bashrc.local
