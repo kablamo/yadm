@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Path::Tiny;
+
+die "The only valid arguments are 'block' or 'unblock'\n" 
+    unless $ARGV[0] && 
+          ($ARGV[0] eq 'block' || $ARGV[0] eq 'unblock');
+
+my @in = path("/etc/hosts")->lines;
+my @out;
+
+for my $line (@in) {
+    if ($ARGV[0] eq 'block') {
+        $line =~ s/^#+\s*// if $line =~ m/0.0.0.0 imgur.com/;
+        $line =~ s/^#+\s*// if $line =~ m/0.0.0.0 news.google.com/;
+        $line =~ s/^#+\s*// if $line =~ m/0.0.0.0 news.ycombinator.com/;
+        $line =~ s/^#+\s*// if $line =~ m/0.0.0.0 youtube.com/;
+    }
+    elsif ($ARGV[0] eq 'unblock') {
+        $line =~ s/^/#/ if $line =~ m/^0.0.0.0 imgur.com/;
+        $line =~ s/^/#/ if $line =~ m/^0.0.0.0 news.google.com/;
+        $line =~ s/^/#/ if $line =~ m/^0.0.0.0 news.ycombinator.com/;
+        $line =~ s/^/#/ if $line =~ m/^0.0.0.0 youtube.com/;
+    }
+    push @out, $line;
+}
+
+path("/tmp/hosts")->spew(@out);
+
+print `sudo mv /tmp/hosts /etc/hosts`;
+print `sudo service network-manager restart`;

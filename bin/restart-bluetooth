@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/sbin/rfkill block bluetooth
+sleep 2
+/usr/sbin/rfkill unblock bluetooth
