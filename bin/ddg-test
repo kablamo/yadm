@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-google-chrome https://$USER.duckduckgo.com/?q=honda # ads
-google-chrome https://$USER.duckduckgo.com/?q=images+of+bananas # images
-google-chrome https://$USER.duckduckgo.com/?q=videos+of+timberlake # videos
-google-chrome https://$USER.duckduckgo.com/?q=amazon+addidas+soccer+shoes # amazon
-google-chrome https://$USER.duckduckgo.com/?q=trump+news # news
-google-chrome https://$USER.duckduckgo.com/?q=map+of+barcelona # maps
-google-chrome https://$USER.duckduckgo.com/?q=twitter+yegg # twitter
-google-chrome https://$USER.duckduckgo.com/?q=wikipedia+homosapiens # wikipedia
-google-chrome https://$USER.duckduckgo.com/?q=curry+recipes # recipes
-google-chrome https://$USER.duckduckgo.com/?q=test+autocomplete+as+well # autocomplete
+hostname=eric
+
+google-chrome https://$hostname.duckduckgo.com/?q=honda # ads
+google-chrome https://$hostname.duckduckgo.com/?q=images+of+bananas # images
+google-chrome https://$hostname.duckduckgo.com/?q=videos+of+timberlake # videos
+google-chrome https://$hostname.duckduckgo.com/?q=amazon+addidas+soccer+shoes # amazon
+google-chrome https://$hostname.duckduckgo.com/?q=trump+news # news
+google-chrome https://$hostname.duckduckgo.com/?q=map+of+barcelona # maps
+google-chrome https://$hostname.duckduckgo.com/?q=twitter+yegg # twitter
+google-chrome https://$hostname.duckduckgo.com/?q=wikipedia+homosapiens # wikipedia
+google-chrome https://$hostname.duckduckgo.com/?q=curry+recipes # recipes
+google-chrome https://$hostname.duckduckgo.com/?q=test+autocomplete+as+well # autocomplete

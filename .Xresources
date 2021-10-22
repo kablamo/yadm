@@ -26,3 +26,8 @@ xterm*saveLines: 12000
 xterm*scrollBar: false
 xterm*scrollstyle: rxvt
 xterm.utf8: true
+xterm*selectToClipboard: true
+xterm*visualBell: true
+xterm*visualBellDelay: 0
+xterm*visualBellLine: true
+xterm*decTerminalID	:	vt340
